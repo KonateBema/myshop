@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commander {{ product.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+ 
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            max-width: 600px;
+            margin: auto;
+        }
+ 
+        .card-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            padding: 15px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+ 
+        .product-image {
+            max-width: 250px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+ 
+        .price-tag {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 10px;
+        }
+ 
+        .total-box {
+            background: #e9ecef;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #dc3545;
+        }
+ 
+        .btn-order {
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: 0.3s;
+            padding: 12px;
+            border-radius: 10px;
+        }
+ 
+        .btn-order:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.3);
+        }
+ 
+        textarea {
+            height: 60px !important;
+        }
+    </style>
+ 
+    <script>
+        function updateTotal() {
+            let price = parseFloat(document.getElementById('price').innerText.replace(',', '.'));
+            let quantity = parseInt(document.getElementById('quantity').value);
+            let total = price * quantity;
+            document.getElementById('total').innerText = total.toFixed(2) + " €";
+        }
+    </script>
+</head>
+ 
+<body>
+    <div class="container mt-4">
+        <div class="card shadow-lg">
+            <div class="card-header">
+                🛒 Commande de {{ product.name }}
+            </div>
+            <div class="card-body text-center">
+                <!-- Image Produit -->
+                <div class="mb-3">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid product-image">
+                    {% else %}
+                    <img src="https://placehold.co/250x200" alt="Image non disponible" class="img-fluid product-image">
+                    {% endif %}
+                </div>
+ 
+                <p class="price-tag">💰 <span id="price">{{ product.price }}</span> €</p>
+ 
+                <!-- Formulaire de commande -->
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                
+                    <!-- Affichage des erreurs -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>⚠️ Erreurs :</strong>
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                
+                    <div class="row mb-3">
+                        <!-- Nom complet -->
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                                {{ form.customer_name }}
+                            </div>
+                        </div>
+                
+                        <!-- Téléphone -->
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                                {{ form.customer_phone }}
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="row mb-3">
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                                {{ form.customer_email }}
+                            </div>
+                        </div>
+                
+                        <!-- Adresse -->
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-house-door-fill"></i></span>
+                                {{ form.customer_address }}
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="row mb-3">
+                        <!-- Mode de paiement -->
+                        <div class="col-12">
+                            <label for="{{ form.payment.id_for_label }}" class="form-label">Mode de paiement</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-credit-card-fill"></i></span>
+                                {{ form.payment }}
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="row mb-3">
+                        <!-- Quantité -->
+                        <div class="col-md-6">
+                            <label for="quantity" class="form-label">Quantité</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-cart-fill"></i></span>
+                                <input type="number" id="quantity" name="quantity" class="form-control"
+                                    value="1" min="1" max="{{ product.quantity }}" oninput="updateTotal()">
+                            </div>
+                        </div>
+                
+                        <!-- Total -->
+                        <div class="col-md-6">
+                            <label class="form-label">Total</label>
+                            <div class="total-box">
+                                <span id="total">{{ product.price }} €</span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Bouton Commander -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-success btn-lg btn-order">
+                            ✅ Confirmer la commande
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
