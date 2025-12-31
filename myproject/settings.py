@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'myapp',
     'import_export',  # Ajout du package
     'ckeditor',  # un bibliothèque qui permet d'intégrer CKEditor
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -53,9 +55,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 ROOT_URLCONF = 'myproject.urls'
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # TEMPLATES = [
 #     {
 #         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -143,7 +152,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
  
 MEDIA_URL = '/media/'  # URL pour accéder aux fichiers médias
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Dossier où seront stockées les images
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Dossier où seront stockées les images
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Dossier où les fichiers statiques seront collectés
 # Pour servir les fichiers statiques en mode debug désactivé
 STATICFILES_DIRS = [

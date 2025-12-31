@@ -131,7 +131,7 @@
             aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)"> <svg
                 class="bi my-1 theme-icon-active" aria-hidden="true">
                 <use href="#circle-half"></use>
-            </svg> <span class="visually-hidden" id="bd-theme-text">Toggle theme</span> </button>
+            </svg> <span class="visually-hidden" id="bd-theme-text">Toggle theme of</span> </button>
         <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text">
             <li> <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light"
                     aria-pressed="false"> <svg class="bi me-2 opacity-50" aria-hidden="true">
@@ -236,11 +236,14 @@
                                     <small class="text-success fw-bold">
                                         <i class="fas fa-check-circle"></i>En stock ({{ product.quantity}})
                                     </small>
-                                    <div class="btn-group"> <button type="button"
-                                            class="btn btn-sm btn-outline-secondary">View</button> <button type="button"
-                                            class="btn btn-sm btn-outline-secondary">Edit</button> </div> <small
-                                        class="text-body-secondary">9 mins</small>
-                                </div>
+                                    <div class="btn-group">
+                                         <!-- <button type="button"
+                                            class="btn btn-sm btn-outline-secondary">View</button>
+                                            <button type="button"
+                                            class="btn btn-sm btn-outline-secondary">Edit</button>  -->
+                                          </div> 
+                                          <small  class="text-body-secondary">9 mins</small>
+                                    </div>
                             </div>
                         </div>
                     </div>
@@ -263,5 +266,4 @@
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         class="astro-vvvwv3sm"></script>
 </body>
-
 </html>
