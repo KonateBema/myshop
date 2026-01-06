@@ -22,7 +22,7 @@
 
 
 from django.shortcuts import render 
-from .models import Product, HomePage , Commande
+from .models import Product, HomePage , Commande , HomeSlide
 from django.shortcuts import get_object_or_404 , redirect
 from .forms import CommandeForm
 from django.http import HttpResponse
@@ -128,3 +128,24 @@ def generate_pdf(request, commande_id):
     p.save()
 
     return response
+
+# def home(request):
+#     slides = HomeSlide.objects.all()
+#     return render(request, 'home.html', {'slides': slides})
+
+def home(request):
+    home_data = HomePage.objects.first()
+    products = Product.objects.all()
+    slides = HomeSlide.objects.all()
+
+    return render(request, 'home.html', {
+        'home_data': home_data,
+        'products': products,
+        'slides': slides
+    })
+
+# creer la views
+# def home(request):
+#     products = Product.objects.all()
+#     home_data = HomePage.objects.first() # recuperer les donners de homePage
+#     return render(request, 'home.html',{'home_data': home_data ,'products':products})

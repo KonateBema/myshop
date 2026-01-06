@@ -3,7 +3,7 @@ from decimal import Decimal
 from .models import Product, Category, Supplier, SupplierDetail
 from django.utils.html import format_html
 from import_export.admin import ImportExportModelAdmin
-from .models import HomePage
+from .models import HomePage , HomeSlide
 from .models import Commande
 from django.utils.html import format_html
 # =============================
@@ -119,6 +119,7 @@ class SupplierDetailAdmin(admin.ModelAdmin):
     list_per_page = 10
 
 
+
 @admin.register(HomePage)
 class HomePageAdmin(admin.ModelAdmin):
      list_display = ('site_name', 'logo_tag', 'logo', 'welcome_titre', 'formatted_welcome_message', 'action1_message', 'action1_lien', 'action2_message', 'action2_lien', 'formatted_contact_message', 'formatted_about_message', 'formatted_footer_message', 'footer_bouton_message')
@@ -208,3 +209,19 @@ class CommandeAdmin(admin.ModelAdmin):
         )
 
     status_colored.short_description = 'Statut'
+
+#  ⚡ Enregistrement de HomeSlide
+@admin.register(HomeSlide)
+class HomeSlideAdmin(admin.ModelAdmin):
+    list_display = ('title', 'action_text', 'action_link', 'image_preview')
+    list_editable = ('action_text', 'action_link')
+    search_fields = ('title', 'message')
+    
+    # Fonction pour afficher un aperçu de l'image
+    def image_preview(self, obj):
+        if obj.image:
+            return f'<img src="{obj.image.url}" width="100" style="object-fit: cover;" />'
+        return "Pas d'image"
+    
+    image_preview.allow_tags = True
+    image_preview.short_description = "Aperçu"

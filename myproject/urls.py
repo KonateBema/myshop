@@ -53,9 +53,9 @@ if settings.DEBUG:
 # from .models import Product , HomePage
 
 # creer la views
-def home(request):
-    products = Product.objects.all()
-    home_data = HomePage.objects.first() # recuperer les donners de homePage
-    return render(request, 'home.html',{'home_data': home_data ,'products':products})
+# def home(request):
+#     products = Product.objects.all()
+#     home_data = HomePage.objects.first() # recuperer les donners de homePage
+#     return render(request, 'home.html',{'home_data': home_data ,'products':products})
 
 

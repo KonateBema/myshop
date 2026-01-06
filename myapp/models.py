@@ -1,5 +1,6 @@
 from django.db import models
 from ckeditor.fields import RichTextField  # Importer RichTextField
+from PIL import Image
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -151,3 +152,28 @@ class Commande(models.Model):
       
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)   
+
+class HomeSlide(models.Model):
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    image = models.ImageField(upload_to='slides/', blank=True, null=True)
+    action_text = models.CharField(max_length=100, blank=True, null=True)
+    action_link = models.URLField(blank=True, null=True)
+
+
+class Slide(models.Model):
+    title = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='slides/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.image:
+            img = Image.open(self.image.path)
+
+            max_width = 1200
+            max_height = 400
+
+            if img.width > max_width or img.height > max_height:
+                img.thumbnail((max_width, max_height))
+                img.save(self.image.path, optimize=True, quality=85)
