@@ -149,3 +149,38 @@ def home(request):
 #     products = Product.objects.all()
 #     home_data = HomePage.objects.first() # recuperer les donners de homePage
 #     return render(request, 'home.html',{'home_data': home_data ,'products':products})
+
+def order_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        quantity = int(request.POST.get('quantity', 1))
+        total = product.price * quantity
+
+        if form.is_valid():
+            order = form.save(commit=False)
+            order.product = product
+            order.quantity = quantity
+            order.total_amount = total
+            order.save()
+
+            # PLUS TARD → appeler API Orange / MTN / Wave ici
+
+            messages.success(request, "Commande enregistrée. Paiement en attente.")
+            return redirect('order_success')
+
+    else:
+        form = OrderForm()
+
+    return render(request, 'order.html', {
+        'product': product,
+        'form': form
+    })
+
+# if order.payment == 'ORANGE':
+#     message = "Veuillez confirmer le paiement Orange Money"
+# elif order.payment == 'MTN':
+#     message = "Veuillez valider le paiement MTN MoMo"
+# else:
+#     message = "Veuillez valider le paiement Wave"

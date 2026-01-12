@@ -139,7 +139,16 @@ class Commande(models.Model):
     customer_email = models.EmailField()
     customer_phone = models.CharField(max_length=20)
     customer_address = models.TextField()
-    payment = models.CharField(max_length=50, choices=[('livraison', 'Paiement à la livraison')])
+    # payment = models.CharField(max_length=50, choices=[('livraison', 'Paiement à la livraison')])
+    payment = models.CharField(
+    max_length=50,
+    choices=[
+        ('LIVRAISON', 'Paiement à la livraison'),
+        ('ORANGE', 'Orange Money'),
+        ('MTN', 'MTN Mobile Money'),
+        ('WAVE', 'Wave'),
+    ]
+)
     is_delivered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
  
@@ -177,3 +186,20 @@ class Slide(models.Model):
             if img.width > max_width or img.height > max_height:
                 img.thumbnail((max_width, max_height))
                 img.save(self.image.path, optimize=True, quality=85)
+
+class Order(models.Model):
+    PAYMENT_CHOICES = [
+        ('ORANGE', 'Orange Money'),
+        ('MTN', 'MTN Mobile Money'),
+        ('WAVE', 'Wave'),
+    ]
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    customer_name = models.CharField(max_length=100)
+    customer_phone = models.CharField(max_length=20)
+    customer_email = models.EmailField()
+    customer_address = models.TextField()
+    payment = models.CharField(max_length=10, choices=PAYMENT_CHOICES)
+    quantity = models.PositiveIntegerField()
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
