@@ -22,7 +22,7 @@
 
 
 from django.shortcuts import render 
-from .models import Product, HomePage , Commande
+from .models import Product, HomePage , Commande , HomeSlide
 from django.shortcuts import get_object_or_404 , redirect
 from .forms import CommandeForm
 from django.http import HttpResponse
@@ -128,3 +128,59 @@ def generate_pdf(request, commande_id):
     p.save()
 
     return response
+
+# def home(request):
+#     slides = HomeSlide.objects.all()
+#     return render(request, 'home.html', {'slides': slides})
+
+def home(request):
+    home_data = HomePage.objects.first()
+    products = Product.objects.all()
+    slides = HomeSlide.objects.all()
+
+    return render(request, 'home.html', {
+        'home_data': home_data,
+        'products': products,
+        'slides': slides
+    })
+
+# creer la views
+# def home(request):
+#     products = Product.objects.all()
+#     home_data = HomePage.objects.first() # recuperer les donners de homePage
+#     return render(request, 'home.html',{'home_data': home_data ,'products':products})
+
+def order_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        quantity = int(request.POST.get('quantity', 1))
+        total = product.price * quantity
+
+        if form.is_valid():
+            order = form.save(commit=False)
+            order.product = product
+            order.quantity = quantity
+            order.total_amount = total
+            order.save()
+
+            # PLUS TARD → appeler API Orange / MTN / Wave ici
+
+            messages.success(request, "Commande enregistrée. Paiement en attente.")
+            return redirect('order_success')
+
+    else:
+        form = OrderForm()
+
+    return render(request, 'order.html', {
+        'product': product,
+        'form': form
+    })
+
+# if order.payment == 'ORANGE':
+#     message = "Veuillez confirmer le paiement Orange Money"
+# elif order.payment == 'MTN':
+#     message = "Veuillez valider le paiement MTN MoMo"
+# else:
+#     message = "Veuillez valider le paiement Wave"
