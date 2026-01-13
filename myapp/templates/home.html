@@ -12,200 +12,97 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <style>
-    /* ===== GLOBAL ===== */
-    body {
-      background-color: #f5f5f5;
-    }
-
-    /* ===== NAVBAR ===== */
-    .navbar-brand img {
-      height: 32px;
-      object-fit: contain;
-    }
-
-    /* ===== CAROUSEL ===== */
-    .carousel-item img {
-      max-height: 400px;
-      object-fit: cover;
-    }
-
-    .carousel-caption {
-      background: rgba(0, 0, 0, 0.45);
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    /* ===== PRODUCTS ===== */
-    .product-card img {
-      height: 200px;
-      object-fit: contain;
-    }
-
-    .product-card {
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-    }
-
-    /* ===== FLASH BAR ===== */
-    .flash-bar {
-      background: #e63946;
-      color: white;
-      font-weight: bold;
-    }
-    /* ===== SIDEBAR CATEGORIES ===== */
-.sidebar {
-  background: #fff;
-  border-radius: 8px;
-  padding: 10px 0;
-}
-
-.sidebar ul li {
-  font-size: 14px;
-  padding: 10px 15px;
-  cursor: pointer;
-  border-bottom: 1px solid #f1f1f1;
-}
-
-.sidebar ul li:hover {
-  background: #f68b1e;
-  color: #fff;
-}
-
-.sidebar ul li i {
-  margin-right: 8px;
-}
-
+    body { background-color: #f5f5f5; }
+    .navbar-brand img { height: 32px; object-fit: contain; }
+    .carousel-item img { max-height: 400px; object-fit: cover; }
+    .carousel-caption { background: rgba(0,0,0,0.45); border-radius: 8px; padding: 20px; }
+    .product-card img { height: 200px; object-fit: contain; }
+    .product-card { transition: transform .2s, box-shadow .2s; }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,.15); }
+    .flash-bar { background: #e63946; color: white; font-weight: bold; }
+    .sidebar { background: #fff; border-radius: 8px; padding: 10px 0; }
+    .sidebar ul li { font-size: 14px; padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f1f1; }
+    .sidebar ul li:hover { background: #f68b1e; color: #fff; }
   </style>
 </head>
 
 <body>
 
 <!-- ================= NAVBAR ================= -->
-<header>
-  <nav class="navbar navbar-dark bg-dark shadow-sm">
-    <div class="container">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="{{ home_data.logo.url }}" alt="logo">
-        <strong class="ms-2">{{ home_data.site_name }}</strong>
-      </a>
-    </div>
-  </nav>
-</header>
-
-<!-- ================= CAROUSEL ================= -->
-<!-- <div id="homeCarousel" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-inner">
-
-    {% for slide in slides %}
-    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-      
-      {% if slide.image %}
-      <img src="{{ slide.image.url }}"
-           class="d-block w-100"
-           {% if not forloop.first %}loading="lazy"{% endif %}
-           alt="{{ slide.title }}">
-      {% else %}
-      <img src="{% static 'default_slide.jpg' %}"
-           class="d-block w-100"
-           alt="Slide par défaut">
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      {% if home_data.logo %}
+      <img src="{{ home_data.logo.url }}" alt="logo">
       {% endif %}
-
-      <div class="carousel-caption d-none d-md-block">
-        <h3>{{ slide.title }}</h3>
-        <p>{{ slide.message|safe }}</p>
-        {% if slide.action_text %}
-          <a href="{{ slide.action_link }}" class="btn btn-warning fw-bold">
-            {{ slide.action_text }}
-          </a>
-        {% endif %}
-      </div>
-    </div>
-    {% endfor %}
-
+      <strong class="ms-2">{{ home_data.site_name }}</strong>
+    </a>
   </div>
+</nav>
 
-  <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </button>
-</div> -->
 <div class="container-fluid mt-3">
-    <div class="row">
-  
-      <!-- ===== SIDEBAR CATEGORIES ===== -->
-      <aside class="col-md-2 d-none d-md-block">
-        <div class="sidebar shadow-sm">
-          <ul class="list-unstyled mb-0">
-  
-            <li><i>📱</i> Téléphones & Tablettes</li>
-            <li><i>📺</i> TV & Électronique</li>
-            <li><i>🏠</i> Maison & Bureau</li>
-            <li><i>💻</i> Informatique</li>
-            <li><i>👗</i> Mode</li>
-            <li><i>🛒</i> Supermarché</li>
-            <li><i>🧴</i> Beauté & Hygiène</li>
-            <li><i>👶</i> Produits Bébé</li>
-            <li><i>🐄</i> Agriculture & Élevage</li>
-  
-          </ul>
-        </div>
-      </aside>
-  
-      <!-- ===== CAROUSEL CENTRAL ===== -->
-      <section class="col-md-7">
-        <div id="homeCarousel" class="carousel slide shadow-sm rounded" data-bs-ride="carousel">
-  
-          <div class="carousel-inner">
-            {% for slide in slides %}
-            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-  
-              {% if slide.image %}
-                <img src="{{ slide.image.url }}"
-                     class="d-block w-100"
-                     {% if not forloop.first %}loading="lazy"{% endif %}
-                     alt="{{ slide.title }}">
-              {% else %}
-                <img src="{% static 'default_slide.jpg' %}" class="d-block w-100">
+  <div class="row">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="col-md-2 d-none d-md-block">
+      <div class="sidebar shadow-sm">
+        <ul class="list-unstyled mb-0">
+          <li>📱 Téléphones & Tablettes</li>
+          <li>📺 TV & Électronique</li>
+          <li>🏠 Maison & Bureau</li>
+          <li>💻 Informatique</li>
+          <li>👗 Mode</li>
+          <li>🛒 Supermarché</li>
+          <li>🧴 Beauté & Hygiène</li>
+          <li>👶 Produits Bébé</li>
+          <li>🐄 Agriculture & Élevage</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ===== CAROUSEL ===== -->
+    <section class="col-md-7">
+      <div id="homeCarousel" class="carousel slide shadow-sm rounded" data-bs-ride="carousel">
+        <div class="carousel-inner">
+
+          {% for slide in slides %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+
+            {% if slide.image %}
+            <img src="{{ slide.image.url }}" class="d-block w-100" {% if not forloop.first %}loading="lazy"{% endif %}>
+            {% else %}
+            <img src="{% static 'default_slide.jpg' %}" class="d-block w-100">
+            {% endif %}
+
+            <div class="carousel-caption d-none d-md-block">
+              <h3>{{ slide.title }}</h3>
+              <p>{{ slide.message|safe }}</p>
+              {% if slide.action_text %}
+              <a href="{{ slide.action_link }}" class="btn btn-warning fw-bold">
+                {{ slide.action_text }}
+              </a>
               {% endif %}
-  
-              <div class="carousel-caption d-none d-md-block">
-                <h3>{{ slide.title }}</h3>
-                <p>{{ slide.message|safe }}</p>
-                {% if slide.action_text %}
-                  <a href="{{ slide.action_link }}" class="btn btn-warning fw-bold">
-                    {{ slide.action_text }}
-                  </a>
-                {% endif %}
-              </div>
-  
             </div>
-            {% endfor %}
+
           </div>
-  
+          {% endfor %}
+
         </div>
-      </section>
-  
-      <!-- ===== ASSISTANCE ===== -->
-      <aside class="col-md-3 d-none d-md-block">
-        <div class="bg-white shadow-sm rounded p-3">
-          <h6>📞 Centre d’assistance</h6>
-          <p class="small">Service client 24/7</p>
-          <strong class="text-danger">2520 006 161</strong>
-          <hr>
-          <button class="btn btn-outline-warning w-100 mb-2">Suivre une commande</button>
-          <button class="btn btn-outline-secondary w-100">Vendre sur la plateforme</button>
-        </div>
-      </aside>
-  
-    </div>
+      </div>
+    </section>
+
+    <!-- ===== ASSISTANCE ===== -->
+    <aside class="col-md-3 d-none d-md-block">
+      <div class="bg-white shadow-sm rounded p-3">
+        <h6>📞 Centre d’assistance</h6>
+        <p class="small">Service client 24/7</p>
+        <strong class="text-danger">2520 006 161</strong>
+      </div>
+    </aside>
+
   </div>
-  
+</div>
+
 <!-- ================= FLASH SALES ================= -->
 <div class="container mt-4">
   <div class="flash-bar p-2 rounded d-flex justify-content-between">
@@ -231,12 +128,20 @@
           <strong class="text-danger mb-2">{{ product.price }} FCFA</strong>
 
           <div class="mt-auto">
-            <a href="{% url 'commande' product.id %}" class="btn btn-sm btn-warning w-100">
+            {% if product.quantity > 0 %}
+            <span class="badge bg-success">En stock</span>
+            <a href="{% url 'commande' product.id %}" class="btn btn-sm btn-warning w-100 mt-2">
               Commander
             </a>
+            {% else %}
+            <span class="badge bg-danger">Rupture de stock</span>
+            <button class="btn btn-sm btn-secondary w-100 mt-2" disabled>
+              Rupture de stock
+            </button>
+            {% endif %}
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
     {% endfor %}
@@ -248,7 +153,9 @@
 <footer class="bg-dark text-white py-4">
   <div class="container text-center">
     <p>{{ home_data.footer_message|safe }}</p>
+    {% if home_data.logo %}
     <img src="{{ home_data.logo.url }}" height="32">
+    {% endif %}
   </div>
 </footer>
 
