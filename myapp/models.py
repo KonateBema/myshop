@@ -134,6 +134,41 @@ class HomePage(models.Model):
 
 
 # ================= COMMANDE =================
+# class Commande(models.Model):
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     quantity = models.PositiveIntegerField()
+#     customer_name = models.CharField(max_length=255)
+#     customer_email = models.EmailField()
+#     customer_phone = models.CharField(max_length=20)
+#     customer_address = models.TextField()
+#     payment = models.CharField(
+#         max_length=50,
+#         choices=[
+#             ("LIVRAISON", "Paiement à la livraison"),
+#             ("ORANGE", "Orange Money"),
+#             ("MTN", "MTN Mobile Money"),
+#             ("WAVE", "Wave"),
+#         ],
+#     )
+#     is_delivered = models.BooleanField(default=False)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     class Meta:
+#         verbose_name = "Commande"
+#         verbose_name_plural = "Commandes"
+
+#     def __str__(self):
+#         return f"Commande {self.id} - {self.customer_name}"
+
+#     def save(self, *args, **kwargs):
+#         if not self.pk:
+#             if self.product.quantity >= self.quantity:
+#                 self.product.quantity -= self.quantity
+#                 self.product.save()
+#             else:
+#                 raise ValueError("Stock insuffisant")
+#         super().save(*args, **kwargs)
+
 class Commande(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
@@ -160,15 +195,13 @@ class Commande(models.Model):
     def __str__(self):
         return f"Commande {self.id} - {self.customer_name}"
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            if self.product.quantity >= self.quantity:
-                self.product.quantity -= self.quantity
-                self.product.save()
-            else:
-                raise ValueError("Stock insuffisant")
-        super().save(*args, **kwargs)
+    @property
+    def status(self):
+        return "delivered" if self.is_delivered else "pending"
 
+    @property
+    def status_display(self):
+        return "Livrée" if self.is_delivered else "En attente"
 
 # ================= SLIDES =================
 class HomeSlide(models.Model):
@@ -208,3 +241,10 @@ class Order(models.Model):
     quantity = models.PositiveIntegerField()
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_delivered = models.BooleanField(default=False)  # déjà existant
+
+    @property
+    def status(self):
+        return "Livré" if self.is_delivered else "En attente"
+
+    status.fget.short_description = "Statut de la commande"

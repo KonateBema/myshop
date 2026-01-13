@@ -36,6 +36,8 @@ from django.conf.urls.static import static
 from myapp.views import home , commande, commande_confirmation, generate_pdf
 
 urlpatterns = [
+    # path('admin/', admin.site.urls),
+    path('admin/dashboard/', views.dashboard, name='admin_dashboard'),
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('commande/<int:product_id>/', commande, name='commande'),

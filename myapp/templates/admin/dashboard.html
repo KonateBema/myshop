@@ -1,0 +1,84 @@
+{% extends "admin/index.html" %}
+{% load static %}
+
+{% block content %}
+<h1 style="margin-bottom:20px;">Dashboard MyShop</h1>
+
+<!-- =================== Cartes statistiques =================== -->
+<div style="display:flex; flex-wrap:wrap; gap:30px; margin-bottom:40px;">
+    <div style="flex:1 1 200px; padding:20px; border-radius:10px; background:#1f2937; color:#fff; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+        <h3>Produits</h3>
+        <p style="font-size:28px; margin:10px 0;">{{ products_count }}</p>
+    </div>
+    <div style="flex:1 1 200px; padding:20px; border-radius:10px; background:#dc2626; color:#fff; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+        <h3>Commandes en attente</h3>
+        <p style="font-size:28px; margin:10px 0;">{{ orders_pending }}</p>
+    </div>
+    <div style="flex:1 1 200px; padding:20px; border-radius:10px; background:#16a34a; color:#fff; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+        <h3>Commandes livrées</h3>
+        <p style="font-size:28px; margin:10px 0;">{{ orders_delivered }}</p>
+    </div>
+</div>
+
+<!-- =================== Graphique des commandes =================== -->
+<div style="padding:20px; border-radius:10px; background:#f3f4f6; max-width:900px; margin-bottom:40px; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+    <h3>Commandes mensuelles</h3>
+    <canvas id="monthlyOrdersChart" height="120"></canvas>
+</div>
+
+<!-- =================== Chart.js =================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('monthlyOrdersChart').getContext('2d');
+
+    // Labels (mois)
+    const labels = [
+        {% for m in monthly_orders %}
+            "{{ m.month|date:'M Y' }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    // Données
+    const data = [
+        {% for m in monthly_orders %}
+            {{ m.total }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    if(labels.length > 0) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Nombre de commandes',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    } else {
+        ctx.font = "16px Arial";
+        ctx.fillText("Aucune commande enregistrée", 10, 50);
+    }
+});
+</script>
+{% endblock %}
