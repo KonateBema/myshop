@@ -23,8 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-jdioqu8$0y6!c3l4^!tvgod2zl=9yt@n--9-qo^071#hr&2=g^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = False  # Assurez-vous que DEBUG est False en production
+# DEBUG = True
+DEBUG = False  # Assurez-vous que DEBUG est False en production
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['*']  # Change '*' par ton vrai domaine en production
 
@@ -82,7 +82,8 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'myapp', 'templates')],
+        # 'DIRS': [os.path.join(BASE_DIR, 'myapp', 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],  # 👈 OBLIGATOIRE
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
