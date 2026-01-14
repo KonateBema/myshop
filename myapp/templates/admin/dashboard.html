@@ -1,0 +1,278 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+    background-color: #12141c;
+    color: #fff;
+    font-family: "Segoe UI", sans-serif;
+    margin:0;
+    padding:0;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 220px;
+    height: 100%;
+    background-color: #1f222e;
+    padding-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.6);
+    z-index: 100;
+}
+
+.sidebar a {
+    color: #00c0ef;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.sidebar a:hover {
+    background-color: #2a2d3b;
+    transform: translateX(5px);
+}
+
+/* Main content */
+.main-content {
+    margin-left: 220px;
+    padding: 25px 30px;
+    width: calc(100% - 220px);
+}
+
+/* Stat cards */
+.stat-card {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #2a2d3b, #1f222e);
+    padding: 20px 25px;
+    border-radius: 15px;
+    gap: 15px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    flex: 1 1 30%;
+    min-width: 220px;
+}
+
+.stat-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.6);
+}
+
+.stat-card i {
+    font-size: 42px;
+    color: #00c0ef;
+}
+
+.stat-card .stat-info .number {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.stat-card .stat-info .label {
+    font-size: 14px;
+    color: #aaa;
+    margin-top: 3px;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+table th, table td {
+    padding: 12px 8px;
+    text-align: left;
+}
+
+table th {
+    background-color: #1f222e;
+    color: #fff;
+}
+
+table tr:nth-child(even) { background-color: #2a2d3b; }
+table tr:nth-child(odd) { background-color: #232634; }
+table tr:hover { background-color: #33364d; }
+
+/* Chart */
+.chart-card {
+    background-color: #1f222e;
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 25px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+}
+
+.chart-card h3 {
+    color: #00c0ef;
+    margin-bottom: 15px;
+}
+
+/* Recent actions */
+ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 15px;
+}
+
+ul li {
+    padding: 10px 15px;
+    background-color: #2a2d3b;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    color: #ccc;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+ul li:hover {
+    background-color: #33364d;
+}
+
+/* Flex wrap pour cartes */
+.cards-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sidebar">
+    <a href="{% url 'admin:myapp_category_changelist' %}"><i class="fas fa-tags"></i> Categories</a>
+    <a href="{% url 'admin:myapp_commande_changelist' %}"><i class="fas fa-shopping-cart"></i> Commandes</a>
+    <a href="{% url 'admin:myapp_supplier_changelist' %}"><i class="fas fa-truck"></i> Fournisseurs</a>
+    <a href="{% url 'admin:myapp_product_changelist' %}"><i class="fas fa-box"></i> Produits</a>
+</div>
+
+<div class="main-content">
+    <!-- Stat cards -->
+    <div class="cards-wrapper">
+        <div class="stat-card"><i class="fas fa-box"></i>
+            <div class="stat-info"><span class="number">{{ products_count }}</span><span class="label">Produits</span></div>
+        </div>
+        <div class="stat-card"><i class="fas fa-clock"></i>
+            <div class="stat-info"><span class="number">{{ orders_pending }}</span><span class="label">Commandes en attente</span></div>
+        </div>
+        <div class="stat-card"><i class="fas fa-check-circle"></i>
+            <div class="stat-info"><span class="number">{{ orders_delivered }}</span><span class="label">Commandes livrées</span></div>
+        </div>
+    </div>
+
+    <!-- Recent Orders Table -->
+    <h3 style="margin-top:25px;">5 Dernières commandes</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cmd in recent_orders %}
+            <tr>
+                <td>{{ cmd.customer_name }}</td>
+                <td>{{ cmd.product.name }}</td>
+                <td>{{ cmd.quantity }}</td>
+                <td>
+                    {% if cmd.is_delivered %}
+                        <span style="color:#00a65a; font-weight:bold;">Livrée</span>
+                    {% else %}
+                        <span style="color:#f39c12; font-weight:bold;">En attente</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" style="color:#ccc;">Aucune commande</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Bar Chart -->
+    <div class="chart-card">
+        <h3>Évolution Mensuelle</h3>
+        <canvas id="barChart" height="300"></canvas>
+    </div>
+
+    <!-- Recent actions -->
+    <h3 style="margin-top:25px;">Actions récentes</h3>
+    <ul>
+        {% for action in recent_actions %}
+        <li>{{ action }}</li>
+        {% empty %}
+        <li>Aucune action récente</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+// Labels par mois
+const months = [{% for order in monthly_orders %}"{{ order.month|date:'M Y' }}",{% endfor %}];
+
+// Données
+const productsData = [{% for order in monthly_orders %}{{ order.products_count }},{% endfor %}];
+const deliveredData = [{% for order in monthly_orders %}{{ order.delivered_count }},{% endfor %}];
+const pendingData = [{% for order in monthly_orders %}{{ order.pending_count }},{% endfor %}];
+
+const ctxBar = document.getElementById('barChart').getContext('2d');
+new Chart(ctxBar, {
+    type: 'bar',
+    data: {
+        labels: months,
+        datasets: [
+            {
+                label: 'Produits',
+                data: productsData,
+                backgroundColor: '#00c0ef',
+                borderRadius: 6
+            },
+            {
+                label: 'Commandes Livrées',
+                data: deliveredData,
+                backgroundColor: '#00a65a',
+                borderRadius: 6
+            },
+            {
+                label: 'Commandes En Attente',
+                data: pendingData,
+                backgroundColor: '#f39c12',
+                borderRadius: 6
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins:{
+            legend:{ labels:{ color:'white', font:{size:14} } },
+            tooltip:{ 
+                backgroundColor:'#1f222e', 
+                titleColor:'#00c0ef', 
+                bodyColor:'#fff',
+                titleFont:{weight:'bold'}
+            }
+        },
+        scales:{
+            x:{ ticks:{ color:'white', font:{size:14} }, grid:{ color:'rgba(255,255,255,0.1)' } },
+            y:{ ticks:{ color:'white', font:{size:14}, stepSize:1 }, grid:{ color:'rgba(255,255,255,0.1)' } }
+        }
+    }
+});
+</script>
+{% endblock %}
