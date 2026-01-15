@@ -50,7 +50,6 @@ from myapp.admin import admin_site  # <- IMPORTANT, on importe l'admin personnal
 urlpatterns = [
     # Admin personnalisé
     path('admin/', admin_site.urls),
-
     # Pages du site
     path('', views.home, name='home'),
     path('commande/<int:product_id>/', views.commande, name='commande'),

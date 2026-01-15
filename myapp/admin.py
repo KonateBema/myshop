@@ -192,6 +192,11 @@ class MyAdminSite(admin.AdminSite):
         return custom_urls + urls
 
     def dashboard_view(self, request):
+        last_commands = (
+            Commande.objects
+            .select_related('product')
+            .order_by('-created_at')[:5]
+        )
         monthly_orders = (
             Commande.objects
             .annotate(month=TruncMonth("created_at"))
@@ -202,6 +207,7 @@ class MyAdminSite(admin.AdminSite):
 
         context = dict(
             self.each_context(request),
+             commande=last_commands,  # 🔥 OBLIGATOIRE
             products_count=Product.objects.count(),
             orders_pending=Commande.objects.filter(is_delivered=False).count(),
             orders_delivered=Commande.objects.filter(is_delivered=True).count(),

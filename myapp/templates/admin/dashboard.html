@@ -90,7 +90,7 @@ body {
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 10px;
     font-size: 15px;
 }
 
@@ -113,37 +113,49 @@ table tr:hover { background-color: #33364d; }
     background-color: #1f222e;
     border-radius: 15px;
     padding: 20px;
-    margin-top: 25px;
     box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
+/* Chart title */
 .chart-card h3 {
     color: #00c0ef;
     margin-bottom: 15px;
 }
 
-/* Recent actions */
-ul {
-    list-style: none;
-    padding-left: 0;
-    margin-top: 15px;
+/* Flex wrapper pour tableau + graphique */
+.dashboard-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 25px;
 }
 
-ul li {
-    padding: 10px 15px;
-    background-color: #2a2d3b;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    color: #ccc;
-    font-size: 14px;
-    transition: background 0.3s;
+/* Chaque colonne - même largeur et hauteur */
+.dashboard-col {
+    flex: 1 1 0;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
 }
 
-ul li:hover {
-    background-color: #33364d;
+/* Tableau et graphique remplissent la colonne */
+.dashboard-col .chart-card {
+    flex: 1;
+    max-height: 500px;
+    width: 100%;
 }
 
-/* Flex wrap pour cartes */
+/* Canvas responsive */
+.dashboard-col canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* Flex wrap pour stat cards */
 .cards-wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -174,105 +186,105 @@ ul li:hover {
         </div>
     </div>
 
-    <!-- Recent Orders Table -->
-    <h3 style="margin-top:25px;">5 Dernières commandes</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Client</th>
-                <th>Produit</th>
-                <th>Quantité</th>
-                <th>Statut</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cmd in recent_orders %}
-            <tr>
-                <td>{{ cmd.customer_name }}</td>
-                <td>{{ cmd.product.name }}</td>
-                <td>{{ cmd.quantity }}</td>
-                <td>
-                    {% if cmd.is_delivered %}
-                        <span style="color:#00a65a; font-weight:bold;">Livrée</span>
-                    {% else %}
-                        <span style="color:#f39c12; font-weight:bold;">En attente</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="4" style="color:#ccc;">Aucune commande</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Dashboard row: Bar chart + Tableau -->
+    <div class="dashboard-row">
+        <!-- Bar chart -->
+        <div class="dashboard-col">
+            <div class="chart-card">
+                <h3>Commandes Livrées / En attente</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
 
-    <!-- Bar Chart -->
-    <div class="chart-card">
-        <h3>Évolution Mensuelle</h3>
-        <canvas id="barChart" height="300"></canvas>
+        <!-- 5 dernières commandes -->
+        <div class="dashboard-col">
+            <div class="chart-card">
+                <h3>🛒 5 Dernières commandes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Paiement</th>
+                            <th>Statut</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cmd in commande %}
+                        <tr>
+                            <td>{{ cmd.customer_name }}</td>
+                            <td>{{ cmd.product.name }}</td>
+                            <td>{{ cmd.quantity }}</td>
+                            <td>{{ cmd.payment }}</td>
+                            <td>
+                                {% if cmd.is_delivered %}
+                                    <span style="color:#00a65a; font-weight:bold;">✔ Livrée</span>
+                                {% else %}
+                                    <span style="color:#f39c12; font-weight:bold;">⏳ En attente</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ cmd.created_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="color:#ccc; text-align:center;">
+                                Aucune commande enregistrée
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
-    <!-- Recent actions -->
-    <h3 style="margin-top:25px;">Actions récentes</h3>
-    <ul>
-        {% for action in recent_actions %}
-        <li>{{ action }}</li>
-        {% empty %}
-        <li>Aucune action récente</li>
-        {% endfor %}
-    </ul>
 </div>
 
 <script>
-// Labels par mois
-const months = [{% for order in monthly_orders %}"{{ order.month|date:'M Y' }}",{% endfor %}];
+document.addEventListener("DOMContentLoaded", function () {
+    const data = {
+        labels: ["Livrées", "En attente"],
+        datasets: [{
+            label: 'Nombre de commandes',
+            data: [{{ orders_delivered }}, {{ orders_pending }}],
+            backgroundColor: ['#00a65a', '#f39c12'],
+            borderColor: ['#00a65a', '#f39c12'],
+            borderWidth: 1
+        }]
+    };
 
-// Données
-const productsData = [{% for order in monthly_orders %}{{ order.products_count }},{% endfor %}];
-const deliveredData = [{% for order in monthly_orders %}{{ order.delivered_count }},{% endfor %}];
-const pendingData = [{% for order in monthly_orders %}{{ order.pending_count }},{% endfor %}];
-
-const ctxBar = document.getElementById('barChart').getContext('2d');
-new Chart(ctxBar, {
-    type: 'bar',
-    data: {
-        labels: months,
-        datasets: [
-            {
-                label: 'Produits',
-                data: productsData,
-                backgroundColor: '#00c0ef',
-                borderRadius: 6
+    const config = {
+        type: 'bar', // type bâton
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1f222e',
+                    titleColor: '#00c0ef',
+                    bodyColor: '#fff',
+                    titleFont: { weight: 'bold' }
+                }
             },
-            {
-                label: 'Commandes Livrées',
-                data: deliveredData,
-                backgroundColor: '#00a65a',
-                borderRadius: 6
-            },
-            {
-                label: 'Commandes En Attente',
-                data: pendingData,
-                backgroundColor: '#f39c12',
-                borderRadius: 6
+            scales: {
+                x: {
+                    ticks: { color: 'white', font: { size: 14 } },
+                    grid: { color: 'rgba(255,255,255,0.1)' }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: 'white', font: { size: 14 }, stepSize: 1 },
+                    grid: { color: 'rgba(255,255,255,0.1)' }
+                }
             }
-        ]
-    },
-    options: {
-        responsive: true,
-        plugins:{
-            legend:{ labels:{ color:'white', font:{size:14} } },
-            tooltip:{ 
-                backgroundColor:'#1f222e', 
-                titleColor:'#00c0ef', 
-                bodyColor:'#fff',
-                titleFont:{weight:'bold'}
-            }
-        },
-        scales:{
-            x:{ ticks:{ color:'white', font:{size:14} }, grid:{ color:'rgba(255,255,255,0.1)' } },
-            y:{ ticks:{ color:'white', font:{size:14}, stepSize:1 }, grid:{ color:'rgba(255,255,255,0.1)' } }
         }
-    }
+    };
+
+    const ctx = document.getElementById('barChart');
+    new Chart(ctx, config);
 });
 </script>
+
 {% endblock %}
