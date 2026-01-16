@@ -49,6 +49,7 @@ from myapp.admin import admin_site  # <- IMPORTANT, on importe l'admin personnal
 # ]
 urlpatterns = [
     # Admin personnalisé
+    # path('admin/', admin.site.urls),
     path('admin/', admin_site.urls),
     # Pages du site
     path('', views.home, name='home'),

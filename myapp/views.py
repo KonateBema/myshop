@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -140,12 +141,11 @@ def generate_pdf(request, commande_id):
 
 def dashboard_view(self, request):
     # 5 dernières commandes
-    last_commands = (
-        Commande.objects
-        .select_related('product')
-        .order_by('-created_at')[:5]
-    )
-
+    if request.user.has_perm('myapp.view_commande'):
+        commandes = Commande.objects.order_by('-created_at')[:5]
+    else:
+        commandes = []
+       
     # Stats mensuelles
     monthly_orders = (
         Commande.objects

@@ -7,6 +7,8 @@ from django.urls import path
 from django.template.response import TemplateResponse
 from django.shortcuts import redirect
 from .models import Product, Category, Supplier, SupplierDetail, HomePage, Commande
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.admin import UserAdmin, GroupAdmin
 
 # ==============================
 #      PRODUCT ADMIN
@@ -222,6 +224,9 @@ class MyAdminSite(admin.AdminSite):
 admin_site = MyAdminSite(name='admin')  # remplace l'admin standard
 
 # Enregistrer les modèles sur l'admin personnalisé
+# Auth Django (OBLIGATOIRE)
+admin_site.register(User, UserAdmin)
+admin_site.register(Group, GroupAdmin)
 admin_site.register(Product, ProductAdmin)
 admin_site.register(Category, CategoryAdmin)
 admin_site.register(Supplier, SupplierAdmin)

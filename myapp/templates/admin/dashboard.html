@@ -4,241 +4,225 @@
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body {
-    background-color: #12141c;
-    color: #fff;
-    font-family: "Segoe UI", sans-serif;
-    margin:0;
-    padding:0;
-}
-
-/* Sidebar */
-.sidebar {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    width: 220px;
-    height: 100%;
-    background-color: #1f222e;
-    padding-top: 25px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.6);
-    z-index: 100;
-}
-
-.sidebar a {
-    color: #00c0ef;
-    text-decoration: none;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.sidebar a:hover {
-    background-color: #2a2d3b;
-    transform: translateX(5px);
-}
-
-/* Main content */
-.main-content {
-    margin-left: 220px;
-    padding: 25px 30px;
-    width: calc(100% - 220px);
-}
-
-/* Stat cards */
-.stat-card {
-    display: flex;
-    align-items: center;
-    background: linear-gradient(135deg, #2a2d3b, #1f222e);
-    padding: 20px 25px;
-    border-radius: 15px;
-    gap: 15px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    flex: 1 1 30%;
-    min-width: 220px;
-}
-
-.stat-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.6);
-}
-
-.stat-card i {
-    font-size: 42px;
-    color: #00c0ef;
-}
-
-.stat-card .stat-info .number {
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.stat-card .stat-info .label {
-    font-size: 14px;
-    color: #aaa;
-    margin-top: 3px;
-}
-
-/* Table */
-table {
+    body {
+        background-color: #12141c;
+        color: #fff;
+        font-family: "Segoe UI", sans-serif;
+        margin:0;
+        padding:0;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 220px;
+        height: calc(100% - 60px);
+        background-color: #1f222e;
+        padding-top: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.6);
+        z-index: 100;
+    }
+    
+    .sidebar a {
+        color: #00c0ef;
+        text-decoration: none;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar a:hover {
+        background-color: #bcc0d1;
+        transform: translateX(5px);
+    }
+    
+    /* Main content */
+    .main-content {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 15px;
-}
-
-table th, table td {
-    padding: 12px 8px;
-    text-align: left;
-}
-
-table th {
-    background-color: #1f222e;
-    color: #fff;
-}
-
-table tr:nth-child(even) { background-color: #2a2d3b; }
-table tr:nth-child(odd) { background-color: #232634; }
-table tr:hover { background-color: #33364d; }
-
-/* Chart */
-.chart-card {
-    background-color: #1f222e;
-    border-radius: 15px;
+    max-width: 100%;
     padding: 20px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    margin: 0;
+    color: #dae5e6;
+ 
 }
 
-/* Chart title */
-.chart-card h3 {
-    color: #00c0ef;
-    margin-bottom: 15px;
-}
-
-/* Flex wrapper pour tableau + graphique */
-.dashboard-row {
-    display: flex;
-    gap: 20px;
-    margin-top: 25px;
-}
-
-/* Chaque colonne - même largeur et hauteur */
-.dashboard-col {
-    flex: 1 1 0;
-    min-width: 300px;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Tableau et graphique remplissent la colonne */
-.dashboard-col .chart-card {
-    flex: 1;
-    max-height: 500px;
-    width: 100%;
-}
-
-/* Canvas responsive */
-.dashboard-col canvas {
-    width: 100% !important;
-    height: auto !important;
-}
-
-/* Flex wrap pour stat cards */
-.cards-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-</style>
+    
+    /* Stat cards */
+    .cards-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+      
+    }
+    
+    .stat-card {
+        display: flex;
+        align-items: center;
+        /* background: linear-gradient(135deg, #2a2d3b, #1f222e); */
+        background: linear-gradient(135deg, #d10da3, #d10da3);
+        padding: 20px;
+        border-radius: 15px;
+        gap: 15px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+        flex: 1 1 250px;
+    }
+    
+    .stat-card i {
+        font-size: 42px;
+        color: #00c0ef;
+    }
+    
+    /* Dashboard layout */
+    .dashboard-row {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        margin-top: 30px;
+    }
+    
+    .dashboard-col {
+        width: 100%;
+    }
+    
+    /* Chart card */
+    .chart-card {
+        background-color: #1f222e;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    }
+    
+    /* Chart title */
+    .chart-card h3 {
+        color: #00c0ef;
+        margin-bottom: 15px;
+    }
+    
+    /* Chart canvas */
+    canvas {
+        width: 100% !important;
+        max-height: 350px;
+    }
+    
+    /* Table */
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        min-width: 700px;
+    }
+    
+    table th, table td {
+        padding: 12px;
+        text-align: left;
+    }
+    
+    table th {
+        background-color: #2a2d3b;
+    }
+    
+    table tr:nth-child(even) { background-color: #2a2d3b; }
+    table tr:nth-child(odd) { background-color: #232634; }
+    table tr:hover { background-color: #33364d; }
+    </style>
+    
 {% endblock %}
 
 {% block content %}
-<div class="sidebar">
+ <div class="sidebar">
+    <a href="{% url 'admin:auth_user_changelist' %}"><i class="fas fa-user"></i> Users</a>
+    <a href="{% url 'admin:auth_group_changelist' %}"><i class="fas fa-users-cog"></i> Groups</a>
     <a href="{% url 'admin:myapp_category_changelist' %}"><i class="fas fa-tags"></i> Categories</a>
     <a href="{% url 'admin:myapp_commande_changelist' %}"><i class="fas fa-shopping-cart"></i> Commandes</a>
     <a href="{% url 'admin:myapp_supplier_changelist' %}"><i class="fas fa-truck"></i> Fournisseurs</a>
     <a href="{% url 'admin:myapp_product_changelist' %}"><i class="fas fa-box"></i> Produits</a>
-</div>
+</div> 
+
 
 <div class="main-content">
     <!-- Stat cards -->
     <div class="cards-wrapper">
         <div class="stat-card"><i class="fas fa-box"></i>
-            <div class="stat-info"><span class="number">{{ products_count }}</span><span class="label">Produits</span></div>
+            <div class="stat-info"><span class="number"><h5>{{products_count}}</h5></span> <span class="label"><h5>Produits</h5></span></div>
         </div>
         <div class="stat-card"><i class="fas fa-clock"></i>
-            <div class="stat-info"><span class="number">{{ orders_pending }}</span><span class="label">Commandes en attente</span></div>
+            <div class="stat-info"><span class="number"><h5>{{orders_pending}}</h5></span> <span class="label"><h5>Commandes en attente</h5></span></div>
         </div>
         <div class="stat-card"><i class="fas fa-check-circle"></i>
-            <div class="stat-info"><span class="number">{{ orders_delivered }}</span><span class="label">Commandes livrées</span></div>
+            <div class="stat-info"><span class="number"><h5>{{orders_delivered}}</h5></span> <span class="label"><h5>Commandes livrées</h5></span></div>
         </div>
     </div>
 
     <!-- Dashboard row: Bar chart + Tableau -->
-    <div class="dashboard-row">
-        <!-- Bar chart -->
+    <div class="dashboard-row" style="flex-direction: column;">
+    
+        <!-- Graphique -->
         <div class="dashboard-col">
             <div class="chart-card">
                 <h3>Commandes Livrées / En attente</h3>
                 <canvas id="barChart"></canvas>
             </div>
         </div>
-
-        <!-- 5 dernières commandes -->
+    
+        <!-- Tableau -->
+        {% if perms.myapp.view_commande %}
         <div class="dashboard-col">
             <div class="chart-card">
                 <h3>🛒 5 Dernières commandes</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Client</th>
-                            <th>Produit</th>
-                            <th>Quantité</th>
-                            <th>Paiement</th>
-                            <th>Statut</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for cmd in commande %}
-                        <tr>
-                            <td>{{ cmd.customer_name }}</td>
-                            <td>{{ cmd.product.name }}</td>
-                            <td>{{ cmd.quantity }}</td>
-                            <td>{{ cmd.payment }}</td>
-                            <td>
-                                {% if cmd.is_delivered %}
-                                    <span style="color:#00a65a; font-weight:bold;">✔ Livrée</span>
-                                {% else %}
-                                    <span style="color:#f39c12; font-weight:bold;">⏳ En attente</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ cmd.created_at|date:"d/m/Y H:i" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" style="color:#ccc; text-align:center;">
-                                Aucune commande enregistrée
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Produit</th>
+                                <th>Quantité</th>
+                                <th>Paiement</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cmd in commande %}
+                            <tr>
+                                <td>{{ cmd.customer_name }}</td>
+                                <td>{{ cmd.product.name }}</td>
+                                <td>{{ cmd.quantity }}</td>
+                                <td>{{ cmd.payment }}</td>
+                                <td>
+                                    {% if cmd.is_delivered %}
+                                        <span style="color:#00a65a;font-weight:bold;">✔ Livrée</span>
+                                    {% else %}
+                                        <span style="color:#f39c12;font-weight:bold;">⏳ En attente</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ cmd.created_at|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        
             </div>
         </div>
+        {% endif %}
+        
+    
     </div>
+    
 </div>
 
 <script>
