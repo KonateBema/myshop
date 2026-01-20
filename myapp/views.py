@@ -9,6 +9,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
+from django.db.models import Q
 
 from django.contrib.admin.models import LogEntry
 from django.db.models import Count, Q
@@ -21,18 +22,45 @@ from .forms import CommandeForm
 
 
 # =================== HOME ===================
+
+
+# def home(request):
+#     home_data = HomePage.objects.first()
+#     slides = HomeSlide.objects.all()
+
+#     query = request.GET.get('q')  # 🔍 récupération du texte recherché
+
+#     products = Product.objects.filter(quantity__gt=0)
+
+#     if query:
+#         products = products.filter(name__icontains=query)
+
+#     return render(request, 'home.html', {
+#         'home_data': home_data,
+#         'products': products,
+#         'slides': slides,
+#         'query': query,  # optionnel
+#     })
 def home(request):
     home_data = HomePage.objects.first()
-    products = Product.objects.filter(quantity__gt=0)
     slides = HomeSlide.objects.all()
+
+    query = request.GET.get('q')
+
+    products = Product.objects.filter(quantity__gt=0)
+
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        )
 
     return render(request, 'home.html', {
         'home_data': home_data,
         'products': products,
-        'slides': slides
+        'slides': slides,
+        'query': query,
     })
-
-
 # =================== COMMANDE ===================
 def commande(request, product_id):
     product = get_object_or_404(Product, id=product_id)

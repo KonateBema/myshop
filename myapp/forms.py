@@ -43,6 +43,16 @@ class CommandeForm(forms.ModelForm):
                 'placeholder': 'Adresse'
             }),
         }
+PAYMENT_CHOICES = [
+    ('ORANGE', 'Orange Money'),
+    ('MTN', 'MTN MoMo'),
+    ('WAVE', 'Wave'),
+]
+
+payment = forms.ChoiceField(
+    choices=PAYMENT_CHOICES,
+    widget=forms.Select(attrs={'class': 'form-select'})
+)
 
 
 # class OrderForm(forms.ModelForm):
