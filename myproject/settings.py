@@ -27,7 +27,6 @@ DEBUG = True
 # DEBUG = False  # Assurez-vous que DEBUG est False en production
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['*']  # Change '*' par ton vrai domaine en production
-
 # Application definition
 
 INSTALLED_APPS = [

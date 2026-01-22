@@ -29,7 +29,7 @@
 <body>
 
 <!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-dark bg-dark shadow-sm">
+<!-- <nav class="navbar navbar-dark bg-dark shadow-sm">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="#">
       {% if home_data.logo %}
@@ -38,7 +38,38 @@
       <strong class="ms-2">{{ home_data.site_name }}</strong>
     </a>
   </div>
+</nav> -->
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container d-flex align-items-center">
+
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      {% if home_data.logo %}
+      <img src="{{ home_data.logo.url }}" alt="logo">
+      {% endif %}
+      <strong class="ms-2">{{ home_data.site_name }}</strong>
+    </a>
+
+    <!-- 🔍 BARRE DE RECHERCHE -->
+    <form method="GET" action="{% url 'home' %}" class="d-flex ms-3 flex-grow-1">
+      <input
+        class="form-control me-2"
+        type="search"
+        name="q"
+        placeholder="Rechercher un produit..."
+        value="{{ query }}"
+      >
+      <button class="btn btn-warning fw-bold" type="submit">
+        Rechercher
+      </button>
+    </form>
+
+  </div>
 </nav>
+
+
+
+
 
 <div class="container-fluid mt-3">
   <div class="row">

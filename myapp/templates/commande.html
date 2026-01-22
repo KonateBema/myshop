@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -58,34 +59,28 @@
             padding: 12px;
             border-radius: 10px;
         }
-
         .btn-order:hover {
             transform: scale(1.05);
             box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.3);
         }
-
         textarea {
             height: 60px !important;
         }
-
         .payment-card {
             border: 2px solid #dee2e6;
             border-radius: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
         .payment-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
         }
-
         input[type="radio"]:checked+.payment-card {
             border-color: #198754;
             background: #e9f7ef;
         }
     </style>
-
     <script>
         function updateTotal() {
             let price = parseFloat(document.getElementById('price').innerText.replace(',', '.'));
@@ -93,9 +88,25 @@
             let total = price * quantity;
             document.getElementById('total').innerText = total.toFixed(2) + " €";
         }
+        document.addEventListener("DOMContentLoaded", function () {
+            const paymentField = document.getElementById("id_payment");
+            const waveQr = document.getElementById("wave-qr");
+
+            function toggleWaveQR() {
+                if (paymentField.value === "WAVE") {
+                    waveQr.classList.remove("d-none");
+                } else {
+                    waveQr.classList.add("d-none");
+                }
+            }
+            // Initial check
+            toggleWaveQR();
+
+            // On change
+            paymentField.addEventListener("change", toggleWaveQR);
+        });
     </script>
 </head>
-
 <body>
     <div class="container mt-4">
         <div class="card shadow-lg">
@@ -170,6 +181,20 @@
 
                     <div class="row mb-3">
                         <!-- Mode de paiement -->
+                        <!-- QR Code Wave -->
+                        <div id="wave-qr" class="text-center mt-4 d-none">
+                            <h5 class="fw-bold text-success">📲 Paiement via Wave</h5>
+                            <p class="small text-muted">
+                                Scannez ce QR Code avec votre application Wave
+                            </p>
+
+                            <img src="{% static 'images/wave_qr.png' %}" alt="QR Code Wave" class="img-fluid"
+                                style="max-width:220px;">
+
+                            <div class="alert alert-info mt-3">
+                                Après le paiement, cliquez sur <strong>Confirmer la commande</strong>
+                            </div>
+                        </div>
 
                         <div class="col-12">
                             <label for="{{ form.payment.id_for_label }}" class="form-label">Mode de paiement</label>
@@ -246,7 +271,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Bouton Commander -->
                     <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-success btn-lg btn-order">
@@ -258,5 +282,4 @@
         </div>
     </div>
 </body>
-
 </html>
