@@ -56,6 +56,7 @@ urlpatterns = [
     path('commande/<int:product_id>/', views.commande, name='commande'),
     path('commande-confirmation/<int:commande_id>/', views.commande_confirmation, name='commande_confirmation'),
     path('commande-confirmation-pdf/<int:commande_id>/', views.generate_pdf, name='generate_pdf'),
+    path('produit/<int:id>/', views.product_detail, name='product_detail'),
 ]
 # permette de charger le fichier image dans django
 if settings.DEBUG:

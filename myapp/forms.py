@@ -24,7 +24,7 @@ class CommandeForm(forms.ModelForm):
                 'placeholder': 'Quantité'
             }),
             'payment': forms.Select(attrs={
-                'class': 'form-control'
+                'class': 'form- '
             }),
             'customer_name': forms.TextInput(attrs={
                 'class': 'form-control', 
@@ -38,7 +38,7 @@ class CommandeForm(forms.ModelForm):
                 'class': 'form-control', 
                 'placeholder': 'Téléphone'
             }),
-            'customer_address': forms.Textarea(attrs={
+            'customer_address': forms.TextInput(attrs={
                 'class': 'form-control', 
                 'placeholder': 'Adresse'
             }),

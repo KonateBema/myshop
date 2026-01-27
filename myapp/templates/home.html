@@ -158,7 +158,7 @@
           <h6>{{ product.name }}</h6>
           <strong class="text-danger mb-2">{{ product.price }} FCFA</strong>
 
-          <div class="mt-auto">
+          <!-- <div class="mt-auto">
             {% if product.quantity > 0 %}
             <span class="badge bg-success">En stock</span>
             <a href="{% url 'commande' product.id %}" class="btn btn-sm btn-warning w-100 mt-2">
@@ -170,7 +170,29 @@
               Rupture de stock
             </button>
             {% endif %}
-          </div>
+          </div> -->
+<div class="mt-auto">
+
+  <!-- 🔍 Bouton DÉTAILS -->
+  <a href="{% url 'product_detail' product.id %}"
+     class="btn btn-sm btn-outline-primary w-100 mb-2">
+    👁️ Voir détails
+  </a>
+
+  {% if product.quantity > 0 %}
+  <span class="badge bg-success">En stock</span>
+  <a href="{% url 'commande' product.id %}"
+     class="btn btn-sm btn-warning w-100 mt-2">
+    Commander
+  </a>
+  {% else %}
+  <span class="badge bg-danger">Rupture de stock</span>
+  <button class="btn btn-sm btn-secondary w-100 mt-2" disabled>
+    Rupture de stock
+  </button>
+  {% endif %}
+
+</div>
 
         </div>
       </div>
