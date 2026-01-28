@@ -56,7 +56,7 @@ MIDDLEWARE = [
 ]
 
 # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 ROOT_URLCONF = 'myproject.urls'
 
 CLOUDINARY_STORAGE = {
@@ -64,7 +64,7 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # TEMPLATES = [
 #     {
 #         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -152,8 +152,9 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
  
-MEDIA_URL = '/media/'  # URL pour accéder aux fichiers médias
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'  # URL pour accéder aux fichiers médias
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Dossier où seront stockées les images
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Dossier où les fichiers statiques seront collectés
 # Pour servir les fichiers statiques en mode debug désactivé
