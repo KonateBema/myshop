@@ -17,8 +17,9 @@ from django.db.models.functions import TruncMonth
 
 import os
 
-from .models import Product, HomePage, HomeSlide, Commande
+from .models import Product, HomePage, HomeSlide, Commande 
 from .forms import CommandeForm
+
 
 
 # =================== HOME ===================
@@ -200,4 +201,24 @@ def dashboard_view(self, request):
 
     return TemplateResponse(request, "admin/dashboard.html", context)
 
+# def product_detail(request, id):
+#     product = get_object_or_404(Product, id=id)
+   
 
+#     return render(request, 'product_detail.html', {
+#         'product': product,
+        
+#     })
+def product_detail(request, id):
+    product = get_object_or_404(Product, id=id)
+  
+    # 🔁 Produits similaires (même catégorie)
+    similar_products = Product.objects.filter(
+       
+    ).exclude(id=product.id)[:4]
+
+    return render(request, 'product_detail.html', {
+        'product': product,
+       
+        'similar_products': similar_products,
+    })
