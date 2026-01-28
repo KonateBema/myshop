@@ -34,16 +34,32 @@ from myapp import views
 from django.conf import settings
 from django.conf.urls.static import static
 from myapp.views import home , commande, commande_confirmation, generate_pdf
+from myapp.admin import admin_site  # <- IMPORTANT, on importe l'admin personnalisé
 
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     # path('admin/dashboard/', views.dashboard, name='admin_dashboard'),
+#     path('admin/dashboard/', dashboard, name='admin_dashboard'),
+#     # path('admin/', admin.site.urls),
+#     path('', views.home, name='home'),
+#     path('commande/<int:product_id>/', commande, name='commande'),
+#     path('commande-confirmation/<int:commande_id>/', commande_confirmation, name='commande_confirmation'),
+#     path('commande-confirmation-pdf/<int:commande_id>/', generate_pdf, name='generate_pdf'),
+
+# ]
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Admin personnalisé
+    # path('admin/', admin.site.urls),
+    path('admin/', admin_site.urls),
+    # Pages du site
     path('', views.home, name='home'),
-    path('commande/<int:product_id>/', commande, name='commande'),
-    path('commande-confirmation/<int:commande_id>/', commande_confirmation, name='commande_confirmation'),
-    path('commande-confirmation-pdf/<int:commande_id>/', generate_pdf, name='generate_pdf'),
+    path('commande/<int:product_id>/', views.commande, name='commande'),
+    path('commande-confirmation/<int:commande_id>/', views.commande_confirmation, name='commande_confirmation'),
+    path('commande-confirmation-pdf/<int:commande_id>/', views.generate_pdf, name='generate_pdf'),
+    path('produit/<int:id>/', views.product_detail, name='product_detail'),
+    # path('produit/<int:id>/', views.product_detail, name='product_detail')
 
 ]
-
 # permette de charger le fichier image dans django
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

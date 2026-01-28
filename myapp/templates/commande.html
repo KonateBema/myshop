@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -5,7 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Commander {{ product.name }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap JS (OBLIGATOIRE pour le modal) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
         body {
@@ -14,249 +23,196 @@
 
         .card {
             border-radius: 15px;
-            overflow: hidden;
             max-width: 600px;
             margin: auto;
         }
 
         .card-header {
             background: linear-gradient(135deg, #ff9100, #e0a627);
-            padding: 15px;
-            text-align: center;
             font-size: 1.5rem;
             font-weight: bold;
             color: white;
+            text-align: center;
         }
 
         .product-image {
             max-width: 250px;
             border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,.1);
         }
 
         .price-tag {
             font-size: 1.4rem;
             font-weight: bold;
-            color: #28a745;
-            margin-top: 10px;
+            color: #198754;
         }
 
         .total-box {
             background: #e9ecef;
             border-radius: 10px;
-            padding: 10px;
-            text-align: center;
             font-size: 1.3rem;
             font-weight: bold;
             color: #dc3545;
+            padding: 10px;
+            text-align: center;
         }
 
         .btn-order {
             font-size: 1.2rem;
             font-weight: bold;
-            transition: 0.3s;
-            padding: 12px;
             border-radius: 10px;
         }
 
         .btn-order:hover {
             transform: scale(1.05);
-            box-shadow: 0px 4px 10px rgba(0, 123, 255, 0.3);
-        }
-
-        textarea {
-            height: 60px !important;
-        }
-
-        .payment-card {
-            border: 2px solid #dee2e6;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .payment-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
-        }
-
-        input[type="radio"]:checked+.payment-card {
-            border-color: #198754;
-            background: #e9f7ef;
         }
     </style>
 
     <script>
         function updateTotal() {
-            let price = parseFloat(document.getElementById('price').innerText.replace(',', '.'));
-            let quantity = parseInt(document.getElementById('quantity').value);
-            let total = price * quantity;
-            document.getElementById('total').innerText = total.toFixed(2) + " €";
+            let price = parseFloat(document.getElementById('price').innerText);
+            let qty = parseInt(document.getElementById('quantity').value);
+            document.getElementById('total').innerText = (price * qty) + " FCFA";
         }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const paymentField = document.getElementById("id_payment");
+            const waveModalEl = document.getElementById("waveModal");
+
+            if (paymentField && waveModalEl) {
+                const waveModal = new bootstrap.Modal(waveModalEl);
+
+                paymentField.addEventListener("change", function () {
+                    if (this.value === "WAVE") {
+                        waveModal.show();
+                    }
+                });
+            }
+        });
     </script>
 </head>
 
 <body>
-    <div class="container mt-4">
-        <div class="card shadow-lg">
-            <div class="card-header">
-                🛒 Commande de {{ product.name }}
+
+<!-- 🔔 MODAL WAVE -->
+<div class="modal fade" id="waveModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">📲 Paiement Wave</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="card-body text-center">
-                <!-- Image Produit -->
-                <div class="mb-3">
-                    {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid product-image">
-                    {% else %}
-                    <img src="https://placehold.co/250x200" alt="Image non disponible" class="img-fluid product-image">
-                    {% endif %}
+
+            <div class="modal-body text-center">
+                <p class="fw-bold">Scannez ce QR Code avec Wave</p>
+
+                <img src="{% static 'images/codeQr.jpg' %}"
+                     class="img-fluid my-3"
+                     style="max-width:230px">
+
+                <div class="alert alert-info">
+                    Après le paiement, cliquez sur <strong>Confirmer la commande</strong>
                 </div>
-
-                <p class="price-tag">💰 <span id="price">{{ product.price }}</span> FCFA</p>
-
-                <!-- Formulaire de commande -->
-                <form method="post" class="mt-4">
-                    {% csrf_token %}
-
-                    <!-- Affichage des erreurs -->
-                    {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <strong>⚠️ Erreurs :</strong>
-                        <ul>
-                            {% for field, errors in form.errors.items %}
-                            {% for error in errors %}
-                            <li>{{ error }}</li>
-                            {% endfor %}
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-
-                    <div class="row mb-3">
-                        <!-- Nom complet -->
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                                {{ form.customer_name }}
-                            </div>
-                        </div>
-
-                        <!-- Téléphone -->
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
-                                {{ form.customer_phone }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <!-- Email -->
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
-                                {{ form.customer_email }}
-                            </div>
-                        </div>
-
-                        <!-- Adresse -->
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-house-door-fill"></i></span>
-                                {{ form.customer_address }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3">
-                        <!-- Mode de paiement -->
-
-                        <div class="col-12">
-                            <label for="{{ form.payment.id_for_label }}" class="form-label">Mode de paiement</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-credit-card-fill"></i></span>
-                                {{ form.payment }}
-                            </div>
-                        </div>
-
-
-                        <!-- <div class="mb-4">
-                            <label class="form-label fw-bold">💳 Moyen de paiement</label>
-
-                            <div class="row g-3">
-
-                                
-                                <div class="col-md-4">
-                                    <label class="payment-option w-100">
-                                        <input type="radio" name="payment" value="ORANGE" required hidden>
-                                        <div class="card text-center p-3 payment-card">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg"
-                                                height="40" class="mb-2">
-                                            <strong>Orange Money</strong>
-                                        </div>
-                                    </label>
-                                </div>
-
-                                
-                                <div class="col-md-4">
-                                    <label class="payment-option w-100">
-                                        <input type="radio" name="payment" value="MTN" required hidden>
-                                        <div class="card text-center p-3 payment-card">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/MTN_logo.svg"
-                                                height="40" class="mb-2">
-                                            <strong>MTN MoMo</strong>
-                                        </div>
-                                    </label>
-                                </div>
-
-                               
-                                <div class="col-md-4">
-                                    <label class="payment-option w-100">
-                                        <input type="radio" name="payment" value="WAVE" required hidden>
-                                        <div class="card text-center p-3 payment-card">
-                                            <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Wave_logo.svg"
-                                                height="40" class="mb-2">
-                                            <strong>Wave</strong>
-                                        </div>
-                                    </label>
-                                </div>
-
-                            </div>
-                        </div> -->
-
-
-                    </div>
-
-                    <div class="row mb-3">
-                        <!-- Quantité -->
-                        <div class="col-md-6">
-                            <label for="quantity" class="form-label">Quantité</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-cart-fill"></i></span>
-                                <input type="number" id="quantity" name="quantity" class="form-control" value="1"
-                                    min="1" max="{{ product.quantity }}" oninput="updateTotal()">
-                            </div>
-                        </div>
-
-                        <!-- Total -->
-                        <div class="col-md-6">
-                            <label class="form-label">Total</label>
-                            <div class="total-box">
-                                <span id="total">{{ product.price }} €</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bouton Commander -->
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-success btn-lg btn-order">
-                            ✅ Confirmer la commande
-                        </button>
-                    </div>
-                </form>
             </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary w-100" data-bs-dismiss="modal">
+                    J’ai payé
+                </button>
+            </div>
+
         </div>
     </div>
-</body>
+</div>
 
+<!-- 🛒 FORMULAIRE -->
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header">
+            🛒 Commande de {{ product.name }}
+        </div>
+
+        <div class="card-body text-center">
+
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="product-image mb-3">
+            {% endif %}
+
+            <p class="price-tag">💰 <span id="price">{{ product.price }}</span> FCFA</p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><label > Nom </label><i class="bi bi-person-fill"></i></span>
+                            {{ form.customer_name }}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><label >Téléphone</label> <i class="bi bi-telephone-fill"></i></span>
+                            {{ form.customer_phone }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="bi bi-envelope-fill me-1"></i> Email
+                        </span>
+                        {{ form.customer_email }}
+                      </div>
+                    </div>
+                  
+                    <div class="col-md-6">
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="bi bi-house-fill me-1"></i> Adresse
+                        </span>
+                        {{ form.customer_address }}
+                      </div>
+                    </div>
+                  
+                  </div>
+                  
+
+                <div class="mb-3">
+                    <label class="form-label">Mode de paiement</label>
+                    {{ form.payment }}
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label>Quantité</label>
+                        <input type="number" id="quantity" name="quantity"
+                               class="form-control" value="1"
+                               min="1" max="{{ product.quantity }}"
+                               oninput="updateTotal()">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Total</label>
+                        <div class="total-box">
+                            <span id="total">{{ product.price }} FCFA</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-success btn-lg w-100 btn-order">
+                    ✅ Confirmer la commande
+                </button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+</body>
 </html>

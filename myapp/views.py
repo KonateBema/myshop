@@ -1,186 +1,224 @@
-# from django.shortcuts import render
-
-# # # Create your views here.
-# # from .models import Product
- 
-# # def home(request):
-# #     products = Product.objects.all() # recuperer tout les produit dans la base de donner
-# #     return render(request, 'home.html', {'products': products})
-
-# from django.shortcuts import render
-# from .models import Product, HomePage
- 
-# def product_list(request):
-#     # Récupère les données de la première page d'accueil
-#     home_data = HomePage.objects.first()
-    
-#     # Récupère tous les produits
-#     products = Product.objects.all()
-    
-#     # Passe les données au template
-#     return render(request, 'home.html', {'home_data': home_data, 'products': products})
-
-
-from django.shortcuts import render 
-from .models import Product, HomePage , Commande , HomeSlide
-from django.shortcuts import get_object_or_404 , redirect
-from .forms import CommandeForm
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
+from django.contrib import messages
+from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.utils import ImageReader
+from django.db.models import Q
+
+from django.contrib.admin.models import LogEntry
+from django.db.models import Count, Q
+from django.db.models.functions import TruncMonth
+
 import os
+
+from .models import Product, HomePage, HomeSlide, Commande 
+from .forms import CommandeForm
+
+
+
+# =================== HOME ===================
+
 
 # def home(request):
 #     home_data = HomePage.objects.first()
-#     products = Product.objects.all()
+#     slides = HomeSlide.objects.all()
+
+#     query = request.GET.get('q')  # 🔍 récupération du texte recherché
+
+#     products = Product.objects.filter(quantity__gt=0)
+
+#     if query:
+#         products = products.filter(name__icontains=query)
+
 #     return render(request, 'home.html', {
 #         'home_data': home_data,
-#         'products': products
+#         'products': products,
+#         'slides': slides,
+#         'query': query,  # optionnel
 #     })
-
 def home(request):
-    products = Product.objects.filter(quantity__gt=0)  # Récupère seulement les produits avec quantité > 0
     home_data = HomePage.objects.first()
-    # home_data = get_home_data()  # Récupère les autres données nécessaires pour le template
-    return render(request, 'home.html', {'products': products, 'home_data': home_data})
-# def commande(request, product_id):
-#     product = get_object_or_404(Product, pk=product_id)
-#     if request.method == "POST":
-#         return render(request, 'commande_confirmation.html', {'product': product})
-#     else:
-#         return render(request, 'commande.html', {'product': product})
+    slides = HomeSlide.objects.all()
 
+    query = request.GET.get('q')
+
+    products = Product.objects.filter(quantity__gt=0)
+
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        )
+
+    return render(request, 'home.html', {
+        'home_data': home_data,
+        'products': products,
+        'slides': slides,
+        'query': query,
+    })
+# =================== COMMANDE ===================
 def commande(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    
+
     if request.method == "POST":
         form = CommandeForm(request.POST)
+        quantity = int(request.POST.get('quantity', 1))
+
         if form.is_valid():
-            commande = form.save(commit=False)
-            commande.product = product
-            commande.save()
-            return redirect('commande_confirmation', commande.id)
+            cmd = form.save(commit=False)
+            cmd.product = product
+            cmd.quantity = quantity
+            cmd.total_amount = product.price * quantity
+            cmd.save()
+
+            messages.success(request, "Commande enregistrée avec succès !")
+            return redirect('commande_confirmation', cmd.id)
     else:
         form = CommandeForm()
-    
-    return render(request, 'commande.html', {'form': form, 'product': product})
 
-# fonction pour comfirmer la commande
+    return render(request, 'commande.html', {
+        'product': product,
+        'form': form
+    })
+
+
 def commande_confirmation(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
     return render(request, 'commande_confirmation.html', {'commande': commande})
 
 
+# =================== GENERATION PDF ===================
 def generate_pdf(request, commande_id):
     commande = get_object_or_404(Commande, id=commande_id)
-    
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="commande_{commande.id}.pdf"'
-    
+
     p = canvas.Canvas(response, pagesize=letter)
     width, height = letter
 
-    # 📌 Ajout du logo (remplace 'logo.png' par le chemin réel de ton logo)
-    logo_path = os.path.join("media", "logo.png")  # Change le chemin selon ton projet
+    logo_path = os.path.join(settings.MEDIA_ROOT, 'logo.png')
     if os.path.exists(logo_path):
-        p.drawImage(ImageReader(logo_path), 50, height - 47, width=80, height=25, mask='auto')
+        p.drawImage(ImageReader(logo_path), 50, height - 47, width=80, height=25)
 
-    # 📌 En-tête du PDF
     p.setFont("Helvetica-Bold", 16)
-    p.drawString(200, height - 50, f"Confirmation de Commande - #{commande.id}")
+    p.drawString(180, height - 50, f"Confirmation de Commande - #{commande.id}")
 
-    # 📌 Ligne de séparation
-    p.setStrokeColor(colors.black)
-    p.setLineWidth(1)
     p.line(50, height - 60, 550, height - 60)
 
-    # 📌 Informations sur la commande
-    p.setFont("Helvetica", 12)
-    y_position = height - 100  # Position de départ
-
+    y = height - 100
     details = [
-        ("Nom du client", commande.customer_name),
+        ("Client", commande.customer_name),
         ("Produit", commande.product.name),
         ("Quantité", str(commande.quantity)),
-        ("Adresse de livraison", commande.customer_address),
-        ("Méthode de paiement", commande.payment),
-        ("Date de commande", commande.created_at.strftime("%d/%m/%Y %H:%M")),
-        ("Total", f"{commande.quantity * commande.product.price} €"),
+        ("Adresse", commande.customer_address),
+        ("Paiement", commande.payment),
+        ("Date", commande.created_at.strftime("%d/%m/%Y %H:%M")),
+        ("Total", f"{commande.total_amount} €"),
     ]
 
     for label, value in details:
         p.setFont("Helvetica-Bold", 12)
-        p.drawString(100, y_position, f"{label} :")
+        p.drawString(100, y, f"{label} :")
         p.setFont("Helvetica", 12)
-        p.drawString(250, y_position, value)
-        y_position -= 25  # Espacement entre les lignes
+        p.drawString(250, y, value)
+        y -= 25
 
-    # 📌 Ligne de fin
-    p.line(50, y_position - 10, 550, y_position - 10)
-
-    # 📌 Remerciement
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(100, y_position - 40, "Merci pour votre confiance ! 🚀")
-
+    p.drawString(100, y - 30, "Merci pour votre confiance 🚀")
     p.showPage()
     p.save()
 
     return response
 
-# def home(request):
-#     slides = HomeSlide.objects.all()
-#     return render(request, 'home.html', {'slides': slides})
 
-def home(request):
-    home_data = HomePage.objects.first()
-    products = Product.objects.all()
-    slides = HomeSlide.objects.all()
+# =================== DASHBOARD ADMIN ===================
+# def dashboard_view(self, request):
+#     # 5 dernières commandes
+#     last_commands = (
+#         Commande.objects
+#         .select_related('product')
+#         .order_by('-created_at')[:5]
+#     )
 
-    return render(request, 'home.html', {
-        'home_data': home_data,
-        'products': products,
-        'slides': slides
-    })
+#     # Stats mensuelles
+#     monthly_orders = (
+#         Commande.objects
+#         .annotate(month=TruncMonth("created_at"))
+#         .values("month")
+#         .annotate(
+#             delivered_count=Count("id", filter=Count("id")),
+#         )
+#         .order_by("month")
+#     )
 
-# creer la views
-# def home(request):
-#     products = Product.objects.all()
-#     home_data = HomePage.objects.first() # recuperer les donners de homePage
-#     return render(request, 'home.html',{'home_data': home_data ,'products':products})
+#     context = dict(
+#         self.each_context(request),
+#         products_count=Product.objects.count(),
+#         orders_pending=Commande.objects.filter(is_delivered=False).count(),
+#         orders_delivered=Commande.objects.filter(is_delivered=True).count(),
+#         commande=last_commands,  # ✅ OBLIGATOIRE
+#         monthly_orders=monthly_orders,
+#     )
 
-def order_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
+#     return TemplateResponse(request, "admin/dashboard.html", context)
 
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        quantity = int(request.POST.get('quantity', 1))
-        total = product.price * quantity
-
-        if form.is_valid():
-            order = form.save(commit=False)
-            order.product = product
-            order.quantity = quantity
-            order.total_amount = total
-            order.save()
-
-            # PLUS TARD → appeler API Orange / MTN / Wave ici
-
-            messages.success(request, "Commande enregistrée. Paiement en attente.")
-            return redirect('order_success')
-
+def dashboard_view(self, request):
+    # 5 dernières commandes
+    if request.user.has_perm('myapp.view_commande'):
+        commandes = Commande.objects.order_by('-created_at')[:5]
     else:
-        form = OrderForm()
+        commandes = []
+       
+    # Stats mensuelles
+    monthly_orders = (
+        Commande.objects
+        .annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(
+            total=Count("id"),
+            delivered_count=Count("id", filter=Q(is_delivered=True)),
+            pending_count=Count("id", filter=Q(is_delivered=False)),
+        )
+        .order_by("month")
+    )
+# Statistiques globales
+    orders_pending_count = Commande.objects.filter(is_delivered=False).count()
+    orders_delivered_count = Commande.objects.filter(is_delivered=True).count()
+    context = dict(
+        self.each_context(request),
+        products_count=Product.objects.count(),
+        orders_pending=Commande.objects.filter(is_delivered=False).count(),
+        orders_delivered=Commande.objects.filter(is_delivered=True).count(),
+        commande=last_commands,
+        monthly_orders=monthly_orders,
+    )
 
-    return render(request, 'order.html', {
+    return TemplateResponse(request, "admin/dashboard.html", context)
+
+# def product_detail(request, id):
+#     product = get_object_or_404(Product, id=id)
+   
+
+#     return render(request, 'product_detail.html', {
+#         'product': product,
+        
+#     })
+def product_detail(request, id):
+    product = get_object_or_404(Product, id=id)
+  
+    # 🔁 Produits similaires (même catégorie)
+    similar_products = Product.objects.filter(
+       
+    ).exclude(id=product.id)[:4]
+
+    return render(request, 'product_detail.html', {
         'product': product,
-        'form': form
+       
+        'similar_products': similar_products,
     })
-
-# if order.payment == 'ORANGE':
-#     message = "Veuillez confirmer le paiement Orange Money"
-# elif order.payment == 'MTN':
-#     message = "Veuillez valider le paiement MTN MoMo"
-# else:
-#     message = "Veuillez valider le paiement Wave"

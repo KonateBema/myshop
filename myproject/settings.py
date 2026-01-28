@@ -23,11 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-jdioqu8$0y6!c3l4^!tvgod2zl=9yt@n--9-qo^071#hr&2=g^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = False  # Assurez-vous que DEBUG est False en production
+# DEBUG = True
+DEBUG = False  # Assurez-vous que DEBUG est False en production
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['*']  # Change '*' par ton vrai domaine en production
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -165,6 +164,98 @@ STATICFILES_DIRS = [
 SILENCED_SYSTEM_CHECKS = [
     "ckeditor.W001",
 ]
+
+JAZZMIN_SETTINGS = {
+
+    # 🔷 TITRES & BRANDING
+    "site_title": "MyShop Admin",
+    "site_header": "MyShop Dashboard",
+    "site_brand": "MyShop",
+    "welcome_sign": "Bienvenue sur le tableau de bord MyShop",
+    "copyright": "MyShop © 2026",
+
+    # 🔷 LOGO
+    "site_logo": "images/logo.png",
+    "site_logo_classes": "img-circle elevation-3",
+    "login_logo": "images/logo.png",
+    "login_logo_dark": "images/logo.png",
+
+    # 🔷 UI
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+
+    # 🔷 TOP MENU
+    # "topmenu_links": [
+    #     {"name": "Accueil", "url": "admin:index", "permissions": ["auth.view_user"]},
+    #     {"name": "Site Web", "url": "/", "new_window": True},
+    # ],
+
+    # 🔷 USER MENU
+    # "usermenu_links": [
+    #     {"model": "auth.user"},
+    #     {"name": "Support", "url": "https://wa.me/225XXXXXXXX", "new_window": True},
+    # ],
+     "topmenu_links": [
+        {"name": "Dashboard", "url": "/admin/dashboard/", "permissions": ["auth.view_user"]},
+        {"name": "Site Web", "url": "/", "new_window": True},
+    ],
+    # 🔷 SIDEBAR ICONS
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.group": "fas fa-users",
+
+        "myapp.categories": "fas fa-tags",
+        "myapp.commandes": "fas fa-shopping-cart",
+        "myapp.produits": "fas fa-box",
+        "myapp.fournisseurs": "fas fa-truck",
+        "myapp.detailsfournisseurs": "fas fa-info-circle",
+        "myapp.homeslide": "fas fa-images",
+    },
+
+    # 🔷 ORDER SIDEBAR
+    "order_with_respect_to": [
+        "myapp",
+        "auth",
+    ],
+
+    "custom_links": {
+        "myapp": [{
+            "name": "Statistiques",
+            "url": "admin:index",
+            "icon": "fas fa-chart-line",
+        }]
+    },
+
+    # 🔷 FOOTER
+    "show_ui_builder": False,
+}
+
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "darkly",  # ⭐ très beau
+    "dark_mode_theme": "darkly",
+
+    "navbar": "navbar-dark",
+    "sidebar": "sidebar-dark-primary",
+    "accent": "accent-primary",
+    "brand_colour": "navbar-primary",
+
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_flat_style": False,
+    "sidebar_nav_legacy_style": False,
+
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
 
 # """
 # Django settings for myproject project.

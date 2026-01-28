@@ -1,5 +1,5 @@
 from django import forms
-from .models import Commande ,Order
+from .models import Commande
  
 class CommandeForm(forms.ModelForm):
     class Meta:
@@ -24,7 +24,7 @@ class CommandeForm(forms.ModelForm):
                 'placeholder': 'Quantité'
             }),
             'payment': forms.Select(attrs={
-                'class': 'form-control'
+                'class': 'form- '
             }),
             'customer_name': forms.TextInput(attrs={
                 'class': 'form-control', 
@@ -38,20 +38,30 @@ class CommandeForm(forms.ModelForm):
                 'class': 'form-control', 
                 'placeholder': 'Téléphone'
             }),
-            'customer_address': forms.Textarea(attrs={
+            'customer_address': forms.TextInput(attrs={
                 'class': 'form-control', 
                 'placeholder': 'Adresse'
             }),
         }
+PAYMENT_CHOICES = [
+    ('ORANGE', 'Orange Money'),
+    ('MTN', 'MTN MoMo'),
+    ('WAVE', 'Wave'),
+]
+
+payment = forms.ChoiceField(
+    choices=PAYMENT_CHOICES,
+    widget=forms.Select(attrs={'class': 'form-select'})
+)
 
 
-class OrderForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = [
-            'customer_name',
-            'customer_phone',
-            'customer_email',
-            'customer_address',
-            'payment',
-        ]
+# class OrderForm(forms.ModelForm):
+#     class Meta:
+#         model = Order
+#         fields = [
+#             'customer_name',
+#             'customer_phone',
+#             'customer_email',
+#             'customer_address',
+#             'payment',
+#         ]

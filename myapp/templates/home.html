@@ -29,7 +29,7 @@
 <body>
 
 <!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-dark bg-dark shadow-sm">
+<!-- <nav class="navbar navbar-dark bg-dark shadow-sm">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="#">
       {% if home_data.logo %}
@@ -38,7 +38,38 @@
       <strong class="ms-2">{{ home_data.site_name }}</strong>
     </a>
   </div>
+</nav> -->
+
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+  <div class="container d-flex align-items-center">
+
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      {% if home_data.logo %}
+      <img src="{{ home_data.logo.url }}" alt="logo">
+      {% endif %}
+      <strong class="ms-2">{{ home_data.site_name }}</strong>
+    </a>
+
+    <!-- 🔍 BARRE DE RECHERCHE -->
+    <form method="GET" action="{% url 'home' %}" class="d-flex ms-3 flex-grow-1">
+      <input
+        class="form-control me-2"
+        type="search"
+        name="q"
+        placeholder="Rechercher un produit..."
+        value="{{ query }}"
+      >
+      <button class="btn btn-warning fw-bold" type="submit">
+        Rechercher
+      </button>
+    </form>
+
+  </div>
 </nav>
+
+
+
+
 
 <div class="container-fluid mt-3">
   <div class="row">
@@ -127,7 +158,8 @@
           <h6>{{ product.name }}</h6>
           <strong class="text-danger mb-2">{{ product.price }} FCFA</strong>
 
-          <div class="mt-auto">
+          <!-- <div class="mt-auto">
+          <!-- <div class="mt-auto">
             {% if product.quantity > 0 %}
             <span class="badge bg-success">En stock</span>
             <a href="{% url 'commande' product.id %}" class="btn btn-sm btn-warning w-100 mt-2">
@@ -139,7 +171,29 @@
               Rupture de stock
             </button>
             {% endif %}
-          </div>
+          </div> -->
+<div class="mt-auto">
+
+  <!-- 🔍 Bouton DÉTAILS -->
+  <a href="{% url 'product_detail' product.id %}"
+     class="btn btn-sm btn-outline-primary w-100 mb-2">
+    👁️ Voir détails
+  </a>
+
+  {% if product.quantity > 0 %}
+  <span class="badge bg-success">En stock</span>
+  <a href="{% url 'commande' product.id %}"
+     class="btn btn-sm btn-warning w-100 mt-2">
+    Commander
+  </a>
+  {% else %}
+  <span class="badge bg-danger">Rupture de stock</span>
+  <button class="btn btn-sm btn-secondary w-100 mt-2" disabled>
+    Rupture de stock
+  </button>
+  {% endif %}
+
+</div>
 
         </div>
       </div>
@@ -148,7 +202,6 @@
 
   </div>
 </div>
-
 <!-- ================= FOOTER ================= -->
 <footer class="bg-dark text-white py-4">
   <div class="container text-center">
