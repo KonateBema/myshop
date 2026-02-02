@@ -42,6 +42,8 @@ from .forms import CommandeForm
 #         'slides': slides,
 #         'query': query,  # optionnel
 #     })
+
+
 def home(request):
     home_data = HomePage.objects.first()
     slides = HomeSlide.objects.all()
@@ -62,6 +64,7 @@ def home(request):
         'slides': slides,
         'query': query,
     })
+
 # =================== COMMANDE ===================
 def commande(request, product_id):
     product = get_object_or_404(Product, id=product_id)
