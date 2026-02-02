@@ -105,7 +105,6 @@ class SupplierDetail(models.Model):
     def __str__(self):
         return f"Détails de {self.supplier}"
 
-
 # ================= HOME PAGE =================
 class HomePage(models.Model):
     site_name = models.CharField(max_length=255)
